@@ -1,0 +1,580 @@
+<!-- <!DOCTYPE HTML>
+<html>
+<head>
+    <title>YA3C Heart Visualisation</title>
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function(){
+            namespace = '/heart'; // change to an empty string to use the global namespace
+
+            // the socket.io documentation recommends sending an explicit package upon connection
+            // this is specially important when using the global namespace
+            var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
+            socket.on('connect', function() {
+                //socket.emit('my event', {data: 'I\'m connected!'});
+
+            });     
+            socket.on('YA3C::heart::GYRO_STREAM', function(message){
+                $("#scrap").html(message.replace(",","<br/>").replace(",","<br/>"));
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="scrap">
+    </div>
+</body>
+</html>
+ -->
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+         <!-- My Styles -->
+         <link rel="stylesheet" type="text/css" href="/static/heart/css/style.css" />
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+
+
+         <!-- Threejs Program -->
+         <script type='text/javascript' src="/static/heart/js/three.js" ></script>
+        <!-- // <script type='text/javascript' src="/static/heart/js/three_new.js" ></script> -->
+
+        
+        <!-- For rendering -->
+        <script src="/static/heart/js/ShaderSkin.js"></script>
+
+        <script src="/static/heart/js/shaders/CopyShader.js"></script>
+
+        <script src="/static/heart/js/postprocessing/EffectComposer.js"></script>
+        <script src="/static/heart/js/postprocessing/RenderPass.js"></script>
+        <script src="/static/heart/js/postprocessing/ShaderPass.js"></script>
+        <script src="/static/heart/js/postprocessing/MaskPass.js"></script>
+
+        <!-- for DOM events -->
+        <script type='text/javascript' src="/static/heart/js/threex.domevent.js"></script>
+        <script type='text/javascript' src="/static/heart/js/threex.domevent.object3d.js"></script>
+
+        <!-- Other Controls and Events -->
+        <script type='text/javascript' src="/static/heart/js/controls/TrackballControls.js"></script>
+        <script type='text/javascript' src="/static/heart/js/AnaglyphEffect.js"></script>
+        <script type='text/javascript' src="/static/heart/js/Detector.js"></script>
+        <script type='text/javascript' src="/static/heart/js/THREEx.FullScreen.js"></script>
+        <script type='text/javascript' src="/static/heart/js/THREEx.WindowResize.js"></script>
+
+         <script type='text/javascript' src="/static/heart/js/dat.gui.js"></script>
+         <script src="/static/heart/js/jquery-1.9.1.min.js"></script>
+
+        <script>
+
+            var mouseX;
+            var mouseY;
+            $(document).mousemove( function(e) {
+               mouseX = e.pageX; 
+               mouseY = e.pageY;
+               $('#DivToShow').css({'top':mouseY-30,'left':mouseX});
+               //console.log(mouseX , mouseY);
+            });
+            
+
+
+            var renderer = null,
+            scene = null,
+            camera = null,
+            zmesh = null,
+            animating = false;
+            
+            var controls, projector;
+
+            var meshes = new Object();
+            
+            var mouse = new THREE.Vector2(), offset = new THREE.Vector3(), INTERSECTED, SELECTED;
+
+            var modelNames =[ "heart","Atrium","RightCoronaryArtery", "LeftCoronaryArtery", "PosteriorInterventricularArtery" , "RightMarginalArtery", "CircumflexArtery", "Veins","Ventricles","Nerves","AorticValve","BicuspidValve","PulmonaryValve","TricuspidValve"];
+
+            var modelOrder =[ "heart","Atrium","RightCoronaryArtery", "LeftCoronaryArtery", "PosteriorInterventricularArtery" , "RightMarginalArtery", "CircumflexArtery", "Veins","Ventricles","Nerves","AorticValve","BicuspidValve","PulmonaryValve","TricuspidValve"];
+            
+
+            //Advance Shader Variables
+            var mapColor, mapHeight, mapSpecular;
+            var firstPass = true;
+            var composer, composerBeckmann;
+
+            /*
+             In Three.js/examples
+             webgl_interactive_draggablecubes.html -->interaction
+                webgl_loader_json_objconverter.html -->load geometry    
+                jeromeetienne.github.io/threex/examples/threex.domevent/ --> labels 
+            */          
+            
+//SET UP        
+            function onLoad() {
+                // Grab our container div
+                var container = document.getElementById("heartContain");
+                
+                // Create the Three.js renderer, add it to our div, append to the DOM
+                renderer = new THREE.WebGLRenderer( { antialias: true } );
+                renderer.setSize(container.offsetWidth, container.offsetHeight);
+                container.appendChild( renderer.domElement );
+
+
+                
+                // Create a new Three.js scene
+                scene = new THREE.Scene();
+                
+                // Put in a camera
+                camera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 2, 4000 );
+                THREE.Object3D._threexDomEvent.camera(camera);
+                camera.position.set( 0, 0, -350 );
+                
+                //add DOM event
+                //var domEvent = new THREEx.DomEvent();
+                //THREEx.DomEvent.noConflict(); 
+                var domEvents = new Object();
+                
+                //Create mouse controls
+                controls = new THREE.TrackballControls ( camera, renderer.domElement );
+                controls.rotateSpeed = 1.5;
+                controls.zoomSpeed = 2.0;
+                controls.panSpeed = 1.0;
+                controls.noZoom = false;
+                controls.noPan = false;
+                controls.staticMoving = true;
+                controls.dynamicDampingFactor = 0.3;
+                
+                
+                // Add some light for ambiance
+                var light = new THREE.AmbientLight(0xA8A8A8);
+                light.position.set(0, 0, 1.0);
+                scene.add( light );
+                
+                var light2 = new THREE.DirectionalLight(0xffffff, 1.0);
+                light2.position.set(0, 50, 1.5);
+                scene.add( light2 );
+
+                // pointLight = new THREE.PointLight( 0xffffff, 1.5, 1000 );
+                // pointLight.position.set( 0, 50, 1.5);
+
+                // scene.add( pointLight );
+
+                // shadow for PointLight
+
+                // spotLight = new THREE.SpotLight( 0xffffff, 1 );
+                // spotLight.position.set( 0.05, 0.05, 1 );
+                // scene.add( spotLight );
+
+                // spotLight.position.multiplyScalar( 700 );
+
+                // spotLight.castShadow = true;
+                // spotLight.onlyShadow = true;
+                // //spotLight.shadowCameraVisible = true;
+
+                // spotLight.shadowMapWidth = 2048;
+                // spotLight.shadowMapHeight = 2048;
+
+                // spotLight.shadowCameraNear = 200;
+                // spotLight.shadowCameraFar = 1500;
+
+                // spotLight.shadowCameraFov = 40;
+
+                // spotLight.shadowBias = -0.005;
+                // spotLight.shadowDarkness = 0.15;
+
+                //add fog
+                // var fog = new THREE.fog();
+                
+                
+                // Load Geometry -- webgl_loader_json_objconverter.html
+                var loader = new THREE.JSONLoader();
+
+
+                //return a funtion that builds the geometry and assigns to array
+                //http://stackoverflow.com/questions/10920372/associate-loaded-json-files-with-a-name-for-later-access
+                function makeHandler(meshName){
+                    return function(geometry){
+                        if (meshName =="Nerves"){
+                            //var nerveColor = new THREE.FaceColors(0xDDE079);
+                            mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial ( { ambient: 0xFFFF33, transparent: true,  side: 2, blending: 1} ) );
+                        }else if(meshName == "heart"){
+                            var textMap = "/static/heart/obj/heart_text_objs/"+meshName+".jpg";
+                            var specMap ="/static/heart/obj/heart_text_objs/heartSPEC.jpg";
+                            var texture = new THREE.ImageUtils.loadTexture(textMap);
+                            var specTexture = new THREE.ImageUtils.loadTexture(specMap);
+                            mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial ( { map:texture, opacity: 1.0, transparent: true, side: 2}) );
+
+                        }else if(meshName == "RightCoronaryArtery" || meshName == "LeftCoronaryArtery" || meshName == "PosteriorInterventricularArtery" || meshName == "RightMarginalArtery" || meshName == "CircumflexArtery"){
+                            //var arteryColor = new THREE.Color(0xDDE079);
+                            mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial ( { color: 0x780000 , ambient:0x780000, side: 2, blending: 1} ) );
+
+                        }else{
+                            var textMap = "/static/heart/obj/heart_text_objs/"+meshName+".jpg";
+                            var texture = new THREE.ImageUtils.loadTexture(textMap);
+                            mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial ( {map:texture, transparent: true, side: 2, blending: 1}) );
+                        }
+                        
+                        //mesh.position.set( x, y, z );
+                        mesh.position.set(0, 0, 0);
+                        mesh.name = meshName;
+                        //mesh.color = [.5, .9, .5];
+                        mesh.doubleSided = true;
+                        scene.add(mesh);
+                        console.log(meshName);
+                        meshes[meshName] = mesh;
+                        
+
+                        
+
+                        mesh.addEventListener('mouseover', function(event){
+                            console.log('mouseover', event.target.name);
+                            //$('#DivToShow').write( event.target.name);
+                            document.getElementById("DivToShow").innerHTML = event.target.name;
+                            $('#DivToShow').css({'display':'inline'}).fadeIn();
+                            //event.target.visible = false;
+                        }).addEventListener('mouseout', function(event){
+                            console.log('mouseout', event.target.name);
+                            $('#DivToShow').css({'display':'none'}).fadeOut();
+                            //event.target.visible = true;
+                        });
+                        
+
+
+                    }
+                }
+                
+
+                //load all heart model meshes
+                for( var i = 0; i < modelNames.length; i++){    
+                    var path = "/static/heart/obj/heart_text_objs/"+modelNames[i]+".js";
+                    meshName = modelNames[i];
+                    loader.load( path, makeHandler(meshName));
+                }
+                
+
+            
+            // // COMPOSER
+
+            //  renderer.autoClear = false;
+
+            // // BECKMANN
+
+            //  var effectBeckmann = new THREE.ShaderPass( THREE.ShaderSkin[ "beckmann" ] );
+            //  var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
+
+            //  effectCopy.renderToScreen = true;
+
+            //  var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: false };
+            //  var rtwidth = 512, rtheight = 512;
+
+            //  composerBeckmann = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
+            //  composerBeckmann.addPass( effectBeckmann );
+            //  composerBeckmann.addPass( effectCopy ); 
+            // //                   
+
+            //event listener
+            //document.addEventListener( 'mousemove', onDocumentMouseMove, false ); 
+            window.addEventListener( 'resize', onWindowResize, false );
+            camera.lookAt( 0, -40, 0);
+            
+
+            // Add a mouse up handler to toggle the animation
+            addMouseHandler();
+
+            run();
+
+
+
+            }
+            
+            var maxDistance = 350;
+            var minBound = 0.2;
+            var maxBound = 1;
+
+            function setZoom(zoomLevel){
+                zoomLevel = 1 - zoomLevel/100;
+
+                // zoomLevel : [0,100]
+                if(zoomLevel < minBound){
+                    zoomLevel = minBound;
+                }
+                if(zoomLevel > maxBound){
+                    zoomLevel = maxBound;
+                }
+
+                console.log(-1 * maxDistance * zoomLevel);
+                camera.position.set( 0, 0, -maxDistance * zoomLevel );
+            }
+
+            function onWindowResize() {
+
+                windowHalfX = window.innerWidth / 2;
+                windowHalfY = window.innerHeight / 2;
+
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+
+                renderer.setSize( window.innerWidth, window.innerHeight );
+
+            }
+            
+        //DRAW      
+            function render(){
+                renderer.render( scene, camera );
+                controls.update();
+
+            }
+            function run()
+            {
+                
+                // Spin the cube for next frame
+                if (animating)
+                {
+                    // //console.log(meshes);
+                    // for(var i = 0; i < meshes.length; i++){
+                    //  meshes[i].rotation.y -= 0.01;
+                    // }
+                }
+                // Ask for another frame
+                requestAnimationFrame(run); // will not render if browser is inactive
+                
+                // Render the scene
+                render();
+            }
+            
+            function addMouseHandler()
+            {
+                var dom = renderer.domElement;
+                dom.addEventListener( 'mouseup', onMouseUp, false);
+            }
+            
+            function onMouseUp    (event)
+            {
+                event.preventDefault();
+                animating = !animating;
+            }
+
+            function printMeshes(){
+                console.log("in print Mesh");
+                //console.log(meshes);
+                for(var i = 0; i < modelNames.length; i++){
+                        console.log(meshes[modelNames[i]]);
+                    }
+            }
+
+            function toggleVisibility(){
+                // //try to access individual mesh
+                // if (meshes[modelNames[i]].visible == true){
+                //      meshes[modelNames[0]].visible = false;
+                //  }else{
+                //      meshes[modelNames[0]].visible = true;
+                //  }
+
+
+                for(var i = 0; i < modelNames.length; i++){
+                    if (meshes[modelNames[i]].visible == true){
+                        meshes[modelNames[i]].visible = false;
+                    }else{
+                        meshes[modelNames[i]].visible = true;
+                    }
+                }
+            }
+
+            $(document).ready(function(){
+                namespace = '/heart'; // change to an empty string to use the global namespace
+
+                // the socket.io documentation recommends sending an explicit package upon connection
+                // this is specially important when using the global namespace
+                var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
+                socket.on('connect', function() {
+                    //socket.emit('my event', {data: 'I\'m connected!'});
+
+                });            
+
+                socket.on('YA3C::heart::GYRO_STREAM', function(message){
+                    // $("#scrap").html(message.replace(",","<br/>").replace(",","<br/>"));
+
+                    var _obj = message.split(",");
+
+
+                    _obj[0] = (parseFloat(_obj[0])/180)*Math.PI; // 0-360
+                    _obj[1] = (parseFloat(_obj[1])/180)*Math.PI; // -180 - 180
+                    _obj[2] = (parseFloat(_obj[2])/180)*Math.PI; // -90 - 90
+
+                    var quaternion = new THREE.Quaternion();
+                    quaternion.setFromEuler(new THREE.Vector3(_obj[0], _obj[1], _obj[2]), 'XYZ');
+
+                    Object.keys(meshes).forEach(function(key) {
+                        // console.log(key, meshes[key]);                        
+                        //meshes[key].rotation = normalizeEulerAngleToCartesian(_obj);
+                        // meshes[key].eulerOrder = "ZXY";
+                        // meshes[key].rotation = new THREE.Vector3(_obj[0], _obj[1], _obj[2]);
+
+                        meshes[key].useQuaternion = true;
+                        meshes[key].quaternion = quaternion;
+
+                        // console.log(_obj)
+
+
+                        // meshes[key].rotateOnAxis(new THREE.Vector3(0,0,1), Math.PI);
+                        // meshes[key].rotateOnAxis(new THREE.Vector3(0,1,0), Math.PI/2);
+
+
+                        // meshes[key].lookAt( normalizeEulerAngleToCartesian(_obj) );
+                    });
+
+                });
+
+                //Shake Handling
+                window.shake_count = 0;
+                window.shake_count_increment = 1;
+                $("#meshName").html(modelOrder[window.shake_count]);
+
+                socket.on('YA3C::heart::COMMANDS', function(message){     
+
+                    if(message=="SHAKE"){
+                        processShake();
+
+                    }else{
+                        //zoomLevel
+                        //console.log(message);
+                        //window.spm = message;
+                        setZoom(parseFloat(message.split(",")[1]));
+                    }
+
+                });
+            });       
+
+            function resetVisibility(){
+                for(var i=0;i<modelOrder.length; i++){
+                    meshes[modelOrder[i]].visible = true;
+                }
+                window.shake_count = 0;
+                window.shake_count_increment = 1;
+            }
+
+            function getBoundedShakeCount(count){
+                if(count<=0){
+                    return 0;
+                }
+                else if(count>=modelOrder.length-1){
+                    return modelOrder.length-1;
+                }else{
+                    return count;
+                }
+            }
+
+            function processShake(){
+
+                        console.log("Shake Count PRE "+window.shake_count);
+                        console.log("Shake Count Increment PRE"+window.shake_count_increment);
+
+
+                        if(meshes[modelOrder[getBoundedShakeCount(window.shake_count)]].visible){
+                            meshes[modelOrder[getBoundedShakeCount(window.shake_count)]].visible = false
+                        }else{
+                            if(window.shake_count == 0 && window.shake_count_increment == 1){
+                                window.shake_count += window.shake_count_increment;
+
+
+                                if(meshes[modelOrder[getBoundedShakeCount(window.shake_count)]].visible){
+                                    meshes[modelOrder[getBoundedShakeCount(window.shake_count)]].visible = false
+                                }else{
+                                    meshes[modelOrder[getBoundedShakeCount(window.shake_count)]].visible = true;                                
+                                }
+
+
+                            }else{
+                                meshes[modelOrder[getBoundedShakeCount(window.shake_count)]].visible = true;                                
+                            }
+                        }
+
+                        if((window.shake_count == modelOrder.length || window.shake_count == -1 )){
+                            window.shake_count_increment *= -1;
+                            console.log("Changing direction to "+ window.shake_count_increment);
+                        }
+
+                        window.shake_count += window.shake_count_increment;
+
+
+                        $("#meshName").html(modelOrder[getBoundedShakeCount(window.shake_count)]);
+
+                        console.log("Shake Count"+window.shake_count);
+                        console.log("Shake Count Increment "+window.shake_count_increment);
+            }
+
+            function normalizeEulerAngleToCartesian(_obj){
+                //Initialise a point facing to X - Axis
+                window._X = new Vector({ x: 1,  y: 0,  z: 0,  w: 0 })
+                window._Y = new Vector({ x: 0,  y: 1,  z: 0,  w: 0 })
+                window._Z = new Vector({ x: 0,  y: 0,  z: 1,  w: 0 })
+
+                // window._Y = new Vector({x:0, y:1, z:0, w:0 })x
+
+                //Rotate Along Z Axis
+                window._X.rotate(window._Z, _obj[0])
+                window._Y.rotate(window._Z, _obj[0])
+
+                window._Y.rotate(window._X, _obj[1])
+                window._Z.rotate(window._X, _obj[1])
+                
+                window._X.rotate(window._Y, _obj[2])
+                window._Z.rotate(window._Y, _obj[2])
+
+
+
+                window._X.x -= 1;
+
+                window._x = window._X.x;
+                window._y = window._X.y;
+                window._z = window._X.z;
+
+
+                return new THREE.Vector3(window._x, window._y, window._z)
+                // return new THREE.Vector3(window._Y.x, window._Y.y, window._Y.z);
+
+
+
+                // //Rotate by Euler(0) on X axis
+                // pointA.rotate(window.X_Axis, _obj[0]);
+                // pointA.rotate(window.Y_Axis, _obj[1]);
+                // pointA.rotate(window.Z_Axis, _obj[2]);
+                // return THREE.Vector3(Math.cos(_obj[0])*Math.sin(_obj[1]),
+                // Math.cos(_obj[0]),
+                // Math.cos(_obj[1])*Math.sin(_obj[0]))
+
+                // return new THREE.Vector3(window.point.x, window.point.y, window.point.z)
+                // 
+                // return new THREE>Vector3(_obj[0], _obj[1], _obj[2]);
+            }     
+
+
+
+            </script>
+
+
+    </head>
+    <body onLoad="onLoad();" style="">
+
+    <script>
+
+
+    </script>
+        <div id="scrap">
+            CERN Webfest 2015 : Human Anatomy Workshop 
+            (Ya3c : Yet Another 3D Controller)
+        </div>
+        <div id="meshName" style="color:red"></div>
+
+        <div id ="heart-gui" style="position:fixed; right:0; top:0;"></div>
+        <div id="heartContain"></div>
+        <div id="prompt" style="width:95%; height:6%; bottom:0; position:absolute;">
+    <!--    <input id="visiblitiy" type="button" value "Visible" onclick="toggleVisibility();"> -->
+        </input>
+    
+
+        </div>
+        <div id="DivToShow"> </div>
+        <script type='text/javascript' src="/static/heart/js/heart.labels.gui.js"></script> 
+        <div class="sourcemodel" style="font-size:8px">3D Model Source : http://heart3d.encephalostudios.com/ThreeJStest/index.html </div>
+    </body>
+</html>

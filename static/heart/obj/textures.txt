@@ -1,0 +1,10 @@
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/heart.jpg
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/heartSPEC.jpg
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/Atrium.jpg
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs//Veins_Diffuse.png
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/Veins.jpg
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/Ventricles.jpg
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/AorticValve.jpg
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/BicuspidValve.jpg
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/PulmonaryValve.jpg
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/TricuspidValve.jpg

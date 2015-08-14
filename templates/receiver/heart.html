@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>YA3C Heart Visualisation</title>
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/alexgibson/shake.js/master/shake.js"></script>    
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function(){
+            namespace = '/heart'; // change to an empty string to use the global namespace
+
+            // the socket.io documentation recommends sending an explicit package upon connection
+            // this is specially important when using the global namespace
+            var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
+            socket.on('connect', function() {
+                window.socketConnected = true;
+                //socket.emit('my event', {data: 'I\'m connected!'});
+            });
+
+            window.ondeviceorientation = function(event) {
+                if(window.socketConnected){
+                    var alpha = event.alpha;
+                    var beta = event.beta;
+                    var gamma = event.gamma;
+
+                    // TODO : Look at possibility of sending data as binary ?
+                    $("#scrap").html(alpha+"<br/>"+beta+"<br/>"+gamma+"<br/>");                    
+                    socket.emit('YA3C::heart::GYRO_STREAM', alpha+","+beta+","+gamma);
+                }
+            }
+
+            window.ondevicemotion = function(event) {
+                var accelerationX = event.accelerationIncludingGravity.x;
+                var accelerationY = event.accelerationIncludingGravity.y;
+                var accelerationZ = event.accelerationIncludingGravity.z;
+
+
+                if(window.socketConnected){
+                    //$("#scrap").html(accelerationX+"<br/>"+accelerationY+"<br/>"+accelerationZ+"<br/>");
+                    socket.emit('YA3C::heart::ACCEL_STREAM', accelerationX+","+accelerationY+","+accelerationZ);
+                }
+            }
+            //listen to shake event
+            var shakeEvent = new Shake({threshold: 5});
+            shakeEvent.start();
+            window.addEventListener('shake', function(){
+                    socket.emit('YA3C::heart::COMMANDS', "SHAKE");
+            }, false);
+
+            //stop listening
+            function stopShake(){
+                shakeEvent.stop();
+            }
+
+
+            $("#zoomLevel").change(function(){
+                    socket.emit('YA3C::heart::COMMANDS', "ZOOM,"+$(this).val());
+
+            })
+
+
+        });
+    </script>
+</head>
+<body>
+    <div id="scrap">
+    </div>
+    <div data-role="page">
+      <div data-role="header">
+        <h1>YA3C</h1>
+      </div>
+
+      <div data-role="main" class="ui-content">
+        <form method="post" action="demoform.asp">
+          <label for="points">Zoom:</label>
+          <input id='zoomLevel' type="range" name="points" id="points" value="0" min="0" max="100" data-popup-enabled="true">
+        </form>
+      </div>
+    </div>
+
+</body>
+</html>
+

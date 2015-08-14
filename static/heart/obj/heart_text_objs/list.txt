@@ -1,0 +1,14 @@
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/heart.js
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/Atrium.js 
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/RightCoronaryArtery.js 
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/LeftCoronaryArtery.js 
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/PosteriorInterventricularArtery.js 
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/RightMarginalArtery.js 
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/CircumflexArtery.js 
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/Veins.js 
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/Ventricles.js 
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/Nerves.js 
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/AorticValve.js 
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/BicuspidValve.js 
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/PulmonaryValve.js 
+http://heart3d.encephalostudios.com/ThreeJStest/obj/heart_text_objs/TricuspidValve.js 
