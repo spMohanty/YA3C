@@ -34,7 +34,9 @@ Usage
   * **Heart Renderer** : Open this on the laptop or any other device where you want to see the heart rendered
   * **Heart Receiver** : Open this link on your smartphone 
 
-* Now you should be able to control the 3D model on the laptop screen using the cellphone
+* Now you should be able to control the 3D model on the laptop screen using the cellphone   
+(Note : Your cellphone and the device used for rendering the model should be in the same local network for realtime responsiveness.   
+Nevertheless it does work over the internet if both the devices can connect to the server hosting the app. More optimisations soon to follow)
 
 TO DO
 ----
