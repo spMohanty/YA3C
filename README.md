@@ -1,6 +1,8 @@
 YA3C (Yet Another 3D Controller)
 ================================
 
+(**Note ::** This is a work in progress, and was developed over a weekend as a proof of concept. Please pardon the ugly code !! Please refer to the end of this document for the original source of the 3D model that was hacked to work with this proof of concept controller)     
+
 This project aims to let users use their regular smartphone as a 3D controller to manipulate 3D objects. The project boasts to be a completely web based solution; and the final end users of the project do not need to install anything separately to be able to use this project. All they need is an updated browser to render the 3D model, and a smartphone (with a gyroscope, but most modern day mid range smartphones have gyroscopes) and and updated browser to control the 3D model.
 
 Dependencies
