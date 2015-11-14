@@ -472,6 +472,14 @@
                     return modelOrder.length - (count - modelOrder.length);
                 }
             }
+
+            function clearModel(){
+                for(var i=0; i<modelOrder.length; i++){
+                    meshes[modelOrder[i]].visible = false;
+                }
+                window.shake_count = modelOrder.length + 1;
+            }
+
             window.first_shake = false;
             function processShake(){
 
@@ -482,7 +490,9 @@
                             meshes[modelOrder[topMod(window.shake_count)]].visible = false
                         }else{
                             meshes[modelOrder[topMod(window.shake_count)]].visible = true    
+                            $("#meshName").html(modelOrder[topMod(window.shake_count)]);
                         }
+
 
                         if(window.shake_count == 0 && window.first_shake){
                             window.first_shake = false;
