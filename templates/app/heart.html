@@ -225,17 +225,17 @@
 
                         
 
-                        mesh.addEventListener('mouseover', function(event){
-                            console.log('mouseover', event.target.name);
-                            //$('#DivToShow').write( event.target.name);
-                            document.getElementById("DivToShow").innerHTML = event.target.name;
-                            $('#DivToShow').css({'display':'inline'}).fadeIn();
-                            //event.target.visible = false;
-                        }).addEventListener('mouseout', function(event){
-                            console.log('mouseout', event.target.name);
-                            $('#DivToShow').css({'display':'none'}).fadeOut();
-                            //event.target.visible = true;
-                        });
+                        // mesh.addEventListener('mouseover', function(event){
+                        //     console.log('mouseover', event.target.name);
+                        //     //$('#DivToShow').write( event.target.name);
+                        //     document.getElementById("DivToShow").innerHTML = event.target.name;
+                        //     $('#DivToShow').css({'display':'inline'}).fadeIn();
+                        //     //event.target.visible = false;
+                        // }).addEventListener('mouseout', function(event){
+                        //     console.log('mouseout', event.target.name);
+                        //     $('#DivToShow').css({'display':'none'}).fadeOut();
+                        //     //event.target.visible = true;
+                        // });
                         
 
 
@@ -427,6 +427,7 @@
                 //Shake Handling
                 window.shake_count = 0;
                 window.shake_count_increment = 1;
+
                 $("#meshName").html(modelOrder[window.shake_count]);
 
                 socket.on('YA3C::heart::COMMANDS', function(message){     
@@ -457,49 +458,47 @@
                     return 0;
                 }
                 else if(count>=modelOrder.length-1){
+                    window.shake_count = modelOrder.length - 1;
                     return modelOrder.length-1;
                 }else{
                     return count;
                 }
             }
 
+            function topMod(count){
+                if(count<modelOrder.length){
+                    return count;
+                }else{
+                    return modelOrder.length - (count - modelOrder.length);
+                }
+            }
+            window.first_shake = false;
             function processShake(){
 
                         console.log("Shake Count PRE "+window.shake_count);
-                        console.log("Shake Count Increment PRE"+window.shake_count_increment);
+                        console.log("Shake Count topMod "+topMod(window.shake_count));
 
-
-                        if(meshes[modelOrder[getBoundedShakeCount(window.shake_count)]].visible){
-                            meshes[modelOrder[getBoundedShakeCount(window.shake_count)]].visible = false
+                        if(meshes[modelOrder[topMod(window.shake_count)]].visible){
+                            meshes[modelOrder[topMod(window.shake_count)]].visible = false
                         }else{
-                            if(window.shake_count == 0 && window.shake_count_increment == 1){
-                                window.shake_count += window.shake_count_increment;
-
-
-                                if(meshes[modelOrder[getBoundedShakeCount(window.shake_count)]].visible){
-                                    meshes[modelOrder[getBoundedShakeCount(window.shake_count)]].visible = false
-                                }else{
-                                    meshes[modelOrder[getBoundedShakeCount(window.shake_count)]].visible = true;                                
-                                }
-
-
-                            }else{
-                                meshes[modelOrder[getBoundedShakeCount(window.shake_count)]].visible = true;                                
-                            }
+                            meshes[modelOrder[topMod(window.shake_count)]].visible = true    
                         }
 
-                        if((window.shake_count == modelOrder.length || window.shake_count == -1 )){
-                            window.shake_count_increment *= -1;
-                            console.log("Changing direction to "+ window.shake_count_increment);
+                        if(window.shake_count == 0 && window.first_shake){
+                            window.first_shake = false;
+                        }else{
+                            window.shake_count += window.shake_count_increment
+                            window.shake_count = window.shake_count % (2*modelOrder.length);
+
+                            window.first_shake = true;
                         }
 
-                        window.shake_count += window.shake_count_increment;
+                        
+                        if(window.shake_count == modelOrder.length){
+                            window.shake_count += window.shake_count_increment
+                            window.shake_count = window.shake_count % (2*modelOrder.length);
+                        }
 
-
-                        $("#meshName").html(modelOrder[getBoundedShakeCount(window.shake_count)]);
-
-                        console.log("Shake Count"+window.shake_count);
-                        console.log("Shake Count Increment "+window.shake_count_increment);
             }
 
             function normalizeEulerAngleToCartesian(_obj){
