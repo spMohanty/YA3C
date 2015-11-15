@@ -2,15 +2,15 @@
 <html>
 <head>
     <title>YA3C Heart Visualisation</title>
-    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/alexgibson/shake.js/master/shake.js"></script>    
-    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
-    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
-    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script type="text/javascript" src="/static/common/js/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="/static/common/js/socket.io.min.js"></script>
+    <script type="text/javascript" src="/static/common/js/shake.js"></script>    
+    <link rel="stylesheet" href="/static/common/css/jquery.mobile-1.4.5.min.css">
+    <script src="/static/common/js/jquery-1.11.3.min.js"></script>
+    <script src="/static/common/js/jquery.mobile-1.4.5.min.js"></script>
 
 
-    <script type="text/javascript" charset="utf-8">
+    <script type="text/javascript" charset="utf-8">    
         $(document).ready(function(){
             namespace = '/heart'; // change to an empty string to use the global namespace
 
@@ -57,6 +57,9 @@
                 shakeEvent.stop();
             }
 
+            $("#clearModel").click(function(){
+                    socket.emit('YA3C::heart::COMMANDS', "CLEAR_MODEL");
+            });
 
             $("#zoomLevel").change(function(){
                     socket.emit('YA3C::heart::COMMANDS', "ZOOM,"+$(this).val());
@@ -68,11 +71,9 @@
     </script>
 </head>
 <body>
-    <div id="scrap">
-    </div>
     <div data-role="page">
       <div data-role="header">
-        <h1>YA3C</h1>
+        <h1>YA3C : Bleh </h1>
       </div>
 
       <div data-role="main" class="ui-content">
@@ -80,6 +81,8 @@
           <label for="points">Zoom:</label>
           <input id='zoomLevel' type="range" name="points" id="points" value="0" min="0" max="100" data-popup-enabled="true">
         </form>
+        <br/><br/><br/>
+    <a id="clearModel" href="#" class="ui-btn  ui-btn-b">Clear Model</a>
       </div>
     </div>
 

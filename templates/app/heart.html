@@ -34,7 +34,7 @@
         <title></title>
          <!-- My Styles -->
          <link rel="stylesheet" type="text/css" href="/static/heart/css/style.css" />
-        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+        <script type="text/javascript" src="/static/common/js/socket.io.min.js"></script>
 
 
          <!-- Threejs Program -->
@@ -205,12 +205,12 @@
 
                         }else if(meshName == "RightCoronaryArtery" || meshName == "LeftCoronaryArtery" || meshName == "PosteriorInterventricularArtery" || meshName == "RightMarginalArtery" || meshName == "CircumflexArtery"){
                             //var arteryColor = new THREE.Color(0xDDE079);
-                            mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial ( { color: 0x780000 , ambient:0x780000, side: 2, blending: 1} ) );
+                            mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial ( { color: 0x780000 , ambient:0x780000, opacity: 1.0, transparent: true, side: 2, blending: 1} ) );
 
                         }else{
                             var textMap = "/static/heart/obj/heart_text_objs/"+meshName+".jpg";
                             var texture = new THREE.ImageUtils.loadTexture(textMap);
-                            mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial ( {map:texture, transparent: true, side: 2, blending: 1}) );
+                            mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial ( {map:texture, opacity:1.0, transparent: true, side: 2, blending: 1}) );
                         }
                         
                         //mesh.position.set( x, y, z );
@@ -435,6 +435,8 @@
                     if(message=="SHAKE"){
                         processShake();
 
+                    }else if(message == "CLEAR_MODEL"){
+                        clearModel();
                     }else{
                         //zoomLevel
                         //console.log(message);
