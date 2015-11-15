@@ -437,6 +437,8 @@
 
                     }else if(message == "CLEAR_MODEL"){
                         clearModel();
+                    }else if(message == "RESET_MODEL"){
+                        resetModel();
                     }else{
                         //zoomLevel
                         //console.log(message);
@@ -480,7 +482,20 @@
                     meshes[modelOrder[i]].visible = false;
                 }
                 window.shake_count = modelOrder.length + 1;
+
+                $("#meshName").html("heart");
             }
+
+            function resetModel(){
+                for(var i=0; i<modelOrder.length; i++){
+                    meshes[modelOrder[i]].visible = true;
+                }
+                window.shake_count = 0;
+                window.first_shake = false;
+                $("#meshName").html("heart");
+                
+            }
+
 
             window.first_shake = false;
             function processShake(){
