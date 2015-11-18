@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>YA3C Eye Visualisation</title>
+    <script type="text/javascript" src="/static/common/js/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="/static/common/js/socket.io.min.js"></script>
+    <script type="text/javascript" src="/static/common/js/shake.js"></script>    
+    <link rel="stylesheet" href="/static/common/css/jquery.mobile-1.4.5.min.css">
+    <script src="/static/common/js/jquery-1.11.3.min.js"></script>
+    <script src="/static/common/js/jquery.mobile-1.4.5.min.js"></script>
+
+
+    <script type="text/javascript" charset="utf-8">    
+        $(document).ready(function(){
+            namespace = '/eye'; // change to an empty string to use the global namespace
+
+            // the socket.io documentation recommends sending an explicit package upon connection
+            // this is specially important when using the global namespace
+            var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
+            socket.on('connect', function() {
+                window.socketConnected = true;
+                //socket.emit('my event', {data: 'I\'m connected!'});
+                $("#messages").html("Connected");
+            });
+
+            window.ondeviceorientation = function(event) {
+                if(window.socketConnected){
+                    var alpha = event.alpha;
+                    var beta = event.beta;
+                    var gamma = event.gamma;
+
+                    // TODO : Look at possibility of sending data as binary ?
+                    $("#scrap").html(alpha+"<br/>"+beta+"<br/>"+gamma+"<br/>");                    
+                    socket.emit('YA3C::eye::GYRO_STREAM', alpha+","+beta+","+gamma);
+                }
+            }
+
+            window.ondevicemotion = function(event) {
+                var accelerationX = event.accelerationIncludingGravity.x;
+                var accelerationY = event.accelerationIncludingGravity.y;
+                var accelerationZ = event.accelerationIncludingGravity.z;
+
+
+                if(window.socketConnected){
+                    //$("#scrap").html(accelerationX+"<br/>"+accelerationY+"<br/>"+accelerationZ+"<br/>");
+                    socket.emit('YA3C::eye::ACCEL_STREAM', accelerationX+","+accelerationY+","+accelerationZ);
+                }
+            }
+            //listen to shake event
+            var shakeEvent = new Shake({threshold: 5});
+            shakeEvent.start();
+            window.addEventListener('shake', function(){
+                    socket.emit('YA3C::eye::COMMANDS', "SHAKE");
+            }, false);
+
+            //stop listening
+            function stopShake(){
+                shakeEvent.stop();
+            }
+
+            $("#clearModel").click(function(){
+                    socket.emit('YA3C::eye::COMMANDS', "CLEAR_MODEL");
+            });
+            $("#resetModel").click(function(){
+                    socket.emit('YA3C::eye::COMMANDS', "RESET_MODEL");
+            });
+            $("#zoomLevel").change(function(){
+                    socket.emit('YA3C::eye::COMMANDS', "ZOOM,"+$(this).val());
+
+            })
+
+
+        });
+    </script>
+</head>
+<body>
+    <div data-role="page">
+      <div data-role="header">
+        <h1>YA3C : Bleh </h1>
+      </div>
+
+      <div data-role="main" class="ui-content">
+        <form method="post" action="demoform.asp">
+          <label for="points">Zoom:</label>
+          <input id='zoomLevel' type="range" name="points" id="points" value="0" min="0" max="100" data-popup-enabled="true">
+        </form>
+        <br/><br/><br/>
+        <br/><br/><br/>
+        <br/><br/><br/>
+        <br/><br/><br/>
+        <br/><br/><br/>
+        <br/><br/><br/>
+        <br/><br/><br/>
+        <br/><br/><br/>
+    <a id="clearModel" href="#" class="ui-btn ui-btn-inline ui-btn-b">Clear Model</a>
+    <br/><br/><br/>
+    <a id="resetModel" href="#" class="ui-btn ui-btn-inline ui-btn-b">Reset Model</a>
+      </div>
+    <br/><br/><br/>
+    <div id="messages">
+    </div>      
+    </div>
+
+</body>
+</html>
+

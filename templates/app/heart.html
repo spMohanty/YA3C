@@ -424,11 +424,6 @@
 
                 });
 
-                //Shake Handling
-                window.shake_count = 0;
-                window.shake_count_increment = 1;
-
-                $("#meshName").html(modelOrder[window.shake_count]);
 
                 socket.on('YA3C::heart::COMMANDS', function(message){     
 
@@ -496,6 +491,11 @@
                 
             }
 
+            //Shake Handling
+            window.shake_count = 0;
+            window.shake_count_increment = 1;
+
+            $("#meshName").html(modelOrder[window.shake_count]);
 
             window.first_shake = false;
             function processShake(){

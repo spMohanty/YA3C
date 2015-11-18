@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>YA3C</title>
+        <link rel="stylesheet" href="/static/eye/eye3dStylesheet_test.css" type="text/css"/>
+        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+        <link rel="icon" href="favicon.ico" type="image/x-icon">
+    </head>
+
+    <body>  
+      
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+            <script type="text/javascript" src="/static/common/js/socket.io.min.js"></script>
+
+        <!--Get the Three.js library--> 
+      <script src="/static/eye/js/Three.js"></script>
+            <script src="/static/eye/js/AnaglyphEffect.js"></script>
+            <script src="/static/eye/js/Detector.js"></script>
+      <script src="/static/eye/js/Stats.js"></script>
+            <script src="/static/eye/js/THREEx.screenshot.js"></script>
+      <script src="/static/eye/js/THREEx.FullScreen.js"></script>
+      <script src="/static/eye/js/THREEx.WindowResize.js"></script>
+            <script src='/static/eye/js/threex.domevent.js'></script>
+      <script src="/static/eye/js/threex.domevent.object3d.js"></script>
+            <script src="/static/eye/js/Tween.js"></script>
+            
+            
+            <!--classes I made for the condition and objectdata-->  
+            <script src="/static/eye/js/Condition.js"></script>
+      <script src="/static/eye/js/ObjectData.js"></script> 
+            
+             <script type="text/javascript">
+          //Create CONDITION objects by querying the database.  Stores metadata for information and names of objects (components) that make up that condition.
+
+var i = 0;
+function debugMomo(){
+  console.log(C_healthy.components[i]);
+  loaded.objects[C_healthy.components[i]].visible = false;
+  i+= 1;
+}
+function debugMomoRev(){
+  i-= 1;
+  console.log(C_healthy.components[i]);
+  loaded.objects[C_healthy.components[i]].visible = true;
+}
+var modelOrder = [ "NEW_Face", "W_SuperiorOblique",  "W_InferiorOblique",  "W_SuperiorRectus",  "W_InferiorRectus",  "W_MedialRectus",  "W_LateralRectus", "W_Sclera", "C_Cornea", "W_Iris", "W_Pupil", "C_Lens",  "C_Zonular",   "C_Sclera", "C_Retina",  "C_CiliaryBody",  "C_Choroid",  "C_OpticNerve", ];
+              
+var C_healthy_bak = new Condition("Healthy Saggital Cross-section", [ "C_Sclera",  "C_Cornea",  "C_Lens",  "C_Zonular",  "C_Iris",  "C_Retina",  "C_CiliaryBody",  "C_Choroid",  "C_OpticNerve", ], "awefsteioj", "weioaekl", "weiowi", "seiofajeio", "http://en.wikipedia.org/wiki/Sclera"); 
+
+              
+var C_healthy = new Condition("Healthy Saggital Cross-section", [ "NEW_Face", "W_SuperiorOblique",  "W_InferiorOblique",  "W_SuperiorRectus",  "W_InferiorRectus",  "W_MedialRectus",  "W_LateralRectus", "W_Sclera", "C_Cornea", "W_Pupil", "C_Lens",  "C_Zonular",  "W_Iris", "C_Sclera", "C_Retina",  "C_CiliaryBody",  "C_Choroid",  "C_OpticNerve", ], "awefsteioj", "weioaekl", "weiowi", "seiofajeio", "http://en.wikipedia.org/wiki/Sclera");         
+
+var E_healthy = new Condition("Healthy External Eye", [ "NEW_Face",  "W_Sclera",  "W_Iris",  "W_Pupil",  "C_OpticNerve",  "W_SuperiorOblique",  "W_InferiorOblique",  "W_SuperiorRectus",  "W_InferiorRectus",  "W_MedialRectus",  "W_LateralRectus", ], "More information coming soon", "More information coming soon", "More information coming soon", "More information coming soon", "http://en.wikipedia.org/wiki/Eye"); 
+              
+              var objectData = {
+                Eye360: {
+                  label: "EYE", 
+                  anatomy: "Duis et erat et ipsum vestibulum sollicitudin. Donec laoreet turpis at turpis aliquam malesuada. ", 
+                  physiology: "Fusce pretium sollicitudin quam, vel varius urna iaculis et. Nullam cursus rhoncus lectus sit amet cursus.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Eye"
+                },
+                
+                Eye180: {
+                  label: "EYE", 
+                  anatomy: "Nunc condimentum placerat purus, a rutrum quam eleifend id. Sed vitae lectus ipsum. Suspendisse laoreet blandit ipsum, et blandit orci porttitor a.", 
+                  physiology: "Fusce vitae tortor diam, at viverra magna. Nunc mattis diam et ligula molestie sed adipiscing augue ornare. Donec tincidunt diam id massa elementum tempor.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Cross_section_(geometry)"
+                },
+                
+                corneaVert: {
+                  label: "CORNEA", 
+                  anatomy: "Although the cornea is clear and seems to lack substance, it is actually a highly organized group of cells and proteins. Unlike most tissues in the body, the cornea contains no blood vessels to nourish or protect it against infection. Instead, the cornea receives its nourishment from the tears and aqueous humor that fills the chamber behind it. The cornea must remain transparent to refract light properly, and the presence of even the tiniest blood vessels can interfere with this process. To see well, all layers of the cornea must be free of any cloudy or opaque areas.", 
+                  physiology: "Because the cornea is as smooth and clear as glass but is strong and durable, it helps the eye in two ways:</br>It helps to shield the rest of the eye from germs, dust, and other harmful matter. The cornea shares this protective task with the eyelids, the eye socket, tears, and the sclera, or white part of the eye.</br>The cornea acts as the eye's outermost lens. It functions like a window that controls and focuses the entry of light into the eye. The cornea contributes between 65-75 percent of the eye's total focusing power.</br>When light strikes the cornea, it bends--or refracts--the incoming light onto the lens. The lens further refocuses that light onto the retina, a layer of light sensing cells lining the back of the eye that starts the translation of light into vision. For you to see clearly, light rays must be focused by the cornea and lens to fall precisely on the retina. The retina converts the light rays into impulses that are sent through the optic nerve to the brain, which interprets them as images.</br>The refractive process is similar to the way a camera takes a picture. The cornea and lens in the eye act as the camera lens. The retina is similar to the film. If the image is not focused properly, the film (or retina) receives a blurry image.</br>The cornea also serves as a filter, screening out some of the most damaging ultraviolet (UV) wavelengths in sunlight. Without this protection, the lens and the retina would be highly susceptible to injury from UV radiation.", 
+                  infoLink: "http://www.nei.nih.gov/health/cornealdisease/#0"
+                },
+                
+                Limbus: {
+                  label: "LIMBUS", 
+                  anatomy: "The corneal limbus is the border of the cornea and the sclera (the white of the eye). The limbus is a common site for the occurrence of corneal epithelial neoplasm. The Limbus contains radially oriented fibrovascular ridges known as the palisades of Vogt that may harbour a stem cell population.The palisades of Vogt are more common in the superior and inferior quadrants around the eye. Aniridia, a developmental anomaly of the iris, disrupts the normal barrier of the cornea to the conjunctival epithelial cells at the limbus.", 
+                  physiology: "bleeh bleh bleh", 
+                  infoLink: "http://en.wikipedia.org/wiki/Corneal_limbus"
+                },
+                
+                LensVert: {
+                  label: "LENS", 
+                  anatomy: "The crystalline lens is a transparent, biconvex structure in the eye that, along with the cornea, helps to refract light to be focused on the retina. ", 
+                  physiology: "The lens, by changing shape, functions to change the focal distance of the eye so that it can focus on objects at various distances, thus allowing a sharp real image of the object of interest to be formed on the retina. This adjustment of the lens is known as accommodation. It is similar to the focusing of a photographic camera via movement of its lenses. The lens is flatter on its anterior side.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Lens_(anatomy)"
+                },
+                
+                TEST_face: {
+                  label: "TEST FACE", 
+                  anatomy: "", 
+                  physiology: "", 
+                  infoLink: "http://www.semayjohnston.com"
+                },
+                
+                N_IrisTemp: {
+                  label: "IRIS", 
+                  anatomy: "asdf", 
+                  physiology: "jkl;", 
+                  infoLink: "http://en.wikipedia.org/wiki/Sclera"
+                },
+                
+                N_Pupil: {
+                  label: "PUPIL", 
+                  anatomy: "asdf", 
+                  physiology: "jkl;", 
+                  infoLink: "http://en.wikipedia.org/wiki/Sclera"
+                },
+                
+                N_Cornea: {
+                  label: "CORNEA", 
+                  anatomy: "asdf", 
+                  physiology: "qwer", 
+                  infoLink: "http://en.wikipedia.org/wiki/Sclera"
+                },
+                
+                N_SuperiorRectus: {
+                  label: "SUPERIOR RECTUS MUSCLE", 
+                  anatomy: "asdf", 
+                  physiology: "jkl;", 
+                  infoLink: "http://en.wikipedia.org/wiki/Sclera"
+                },
+                
+                N_InferiorRectus: {
+                  label: "INFERIOR RECTUS MUSCLE", 
+                  anatomy: "asdf", 
+                  physiology: "jkl;", 
+                  infoLink: "http://en.wikipedia.org/wiki/Sclera"
+                },
+                
+                N_Sclera: {
+                  label: "SCLERA", 
+                  anatomy: "asdf", 
+                  physiology: "jkl;", 
+                  infoLink: "http://en.wikipedia.org/wiki/Sclera"
+                },
+                
+                C_Sclera: {
+                  label: "SCLERA", 
+                  anatomy: "Information about the anatomy of the sclera coming soon.", 
+                  physiology: "Information about the physiology of the sclera coming soon.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Sclera"
+                },
+                
+                C_Cornea: {
+                  label: "CORNEA", 
+                  anatomy: "Information about the anatomy of the cornea coming soon.", 
+                  physiology: "Information about the physiology of the cornea coming soon.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Cornea"
+                },
+                
+                C_Lens: {
+                  label: "LENS", 
+                  anatomy: "Information about the anatomy of the lens coming soon.", 
+                  physiology: "Information about the physiology of the lens coming soon.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Lens"
+                },
+                
+                C_Zonular: {
+                  label: "ZONULAR FIBERS", 
+                  anatomy: "Information about the anatomy of the zonular fibers coming soon.", 
+                  physiology: "Information about the physiology of the zonular fibers coming soon.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Zonular_fibers"
+                },
+                
+                C_Iris: {
+                  label: "IRIS", 
+                  anatomy: "Information about the anatomy of the iris coming soon.", 
+                  physiology: "Information about the physiology of the iris coming soon.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Iris_\(anatomy\)"
+                },
+                
+                C_Retina: {
+                  label: "RETINA", 
+                  anatomy: "Information about the anatomy of the retina coming soon.", 
+                  physiology: "Information about the physiology of the retina coming soon.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Retina"
+                },
+                
+                C_CiliaryBody: {
+                  label: "CILIARY BODY", 
+                  anatomy: "Information about the anatomy of the ciliary body coming soon.", 
+                  physiology: "Information about the physiology of the ciliary body coming soon.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Ciliary_body"
+                },
+                
+                C_Choroid: {
+                  label: "CHOROID", 
+                  anatomy: "Information about the anatomy of the choroid coming soon.", 
+                  physiology: "Information about the physiology of the choroid coming soon.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Choroid"
+                },
+                
+                C_OpticNerve: {
+                  label: "OPTIC NERVE", 
+                  anatomy: "Information about the anatomy of the optic nerve coming soon.", 
+                  physiology: "Information about the physiology of the optic nerve coming soon.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Optic_nerve"
+                },
+                
+                W_Iris: {
+                  label: "IRIS", 
+                  anatomy: "Information about the anatomy of the iris coming soon.", 
+                  physiology: "Information about the physiology of the iris coming soon.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Iris_\(anatomy\)"
+                },
+                
+                W_Pupil: {
+                  label: "PUPIL", 
+                  anatomy: "Information about the antatomy of the pupil coming soon.", 
+                  physiology: "", 
+                  infoLink: "http://en.wikipedia.org/wiki/Sclera"
+                },
+                
+                W_Sclera: {
+                  label: "SCLERA", 
+                  anatomy: "Information about the anatomy of the sclera coming soon.", 
+                  physiology: "Information about the physiology of the sclera coming soon.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Sclera"
+                },
+                
+                W_SuperiorRectus: {
+                  label: "SUPERIOR RECTUS MUSCLE", 
+                  anatomy: "Information about the anatomy of the superior rectus muscle coming soon.", 
+                  physiology: "Information about the physiology of the superior rectus muscle coming soon.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Superior_rectus_muscle"
+                },
+                
+                W_InferiorRectus: {
+                  label: "INFERIOR RECTUS MUSCLE", 
+                  anatomy: "Information about the anatomy of the inferior rectus muscle coming soon.", 
+                  physiology: "Information about the physiology of the inferior rectus muscle coming soon.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Inferior_rectus_muscle"
+                },
+                
+                W_MedialRectus: {
+                  label: "MEDIAL RECTUS MUSCLE", 
+                  anatomy: "Information about the anatomy of the medial rectus muscle coming soon.", 
+                  physiology: "Information about the physiology of the medial rectus muscle coming soon.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Medial_rectus_muscle"
+                },
+                
+                W_LateralRectus: {
+                  label: "LATERAL RECTUS MUSCLE", 
+                  anatomy: "Information about the anatomy of the lateral rectus muscle coming soon.", 
+                  physiology: "Information about the physiology of the lateral rectus muscle coming soon.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Lateral_rectus_muscle"
+                },
+                
+                W_SuperiorOblique: {
+                  label: "SUPERIOR OBLIQUE MUSCLE", 
+                  anatomy: "Information about the anatomy of the superior oblique muscle coming soon.", 
+                  physiology: "Information about the physiology of the superior oblique muscle coming soon.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Superior_oblique_muscle"
+                },
+                
+                W_InferiorOblique: {
+                  label: "INFERIOR OBLIQUE MUSCLE", 
+                  anatomy: "Information about the anatomy of the inferior oblique muscle coming soon.", 
+                  physiology: "Information about the physiology of the inferior oblique muscle coming soon.", 
+                  infoLink: "http://en.wikipedia.org/wiki/Inferior_oblique_muscle"
+                },
+                
+                NEW_Face: {
+                  label: "EXTERNAL ANATOMY", 
+                  anatomy: "information about external anatomy", 
+                  physiology: "Information about external physiology", 
+                  infoLink: "http://www.semayjohnston.com"
+                },
+                
+                NEW_SuperiorRectus: {
+                  label: "SUPERIOR RECTUS MUSCLE", 
+                  anatomy: "information about superior rectus anatomy", 
+                  physiology: "Information about superior rectus physiology", 
+                  infoLink: "#"
+                },
+                }               
+          var selectedCondition=C_healthy;
+          var previousCondition;
+                    
+          var labels = false;
+          var anaglyph = false;
+          var info = false;
+      </script>
+            
+        <header>
+                         
+         </header>
+
+        <div id="leftContainer"> 
+        <div id="scrap">
+            Ya3c : Yet Another 3D Controller
+        </div>
+        <div id="meshName" style="color:red"></div>
+
+            <div id="infoBox">
+                    <input id="tab-a" type="radio" name="radio-set" class="tab-selector-1" checked="checked"/>
+                    <label for="tab-a" class="tab-label-1">CONDITION</label>
+                 
+                    <input id="tab-b" type="radio" name="radio-set" class="tab-selector-2" />
+                    <label for="tab-b" class="tab-label-2">ANATOMY</label>
+                    <a id="X" onClick="xInfo()">x</a>
+                    <div class="clear-shadow"></div>
+                    <div class="content">
+                        <div class="content-1">
+                            <h2><span id="conditionName">CONDITION NAME</span></h2>
+                            <p><span id="conditionContent">Some content</span></p>
+                            <a id="conditionLink"  href="#" target="_blank" class="contentLink">more info</a>
+                        </div>
+                        <div class="content-2" id="content-2">
+                            <h2><span id="anatomyName">CLICK ON AN OBJECT TO VIEW INFORMATION</span></h2>
+                            <p><span id="anatomyContent"></span></p>
+                            <a id="anatomyLink"  href="#" target="_blank" class="contentLink">more info</a>
+                        </div>
+                        
+                    </div>
+                    
+                   
+            </div> 
+            
+            <div id="left">
+                        
+                <div id="sketch">
+                    <script type="text/javascript">
+                        document.getElementById('tab-a').checked=true; //added this because it wasn't checking this checkbox like it should have with checked="checked"  not sure why
+                        mouseFollow();  //function for the interactive label to follow the mouse
+                        
+                        //WEBGL DETECTOR and STATS
+                        if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+                        var STATS_ENABLED = false;
+                        var stats = new Stats;
+                                    
+                        var controls, camera, group, scene, renderer, geometry, material, effect;
+                        var loaded;
+                        var eyeScale=1; //scale of group
+                       
+                          
+                        init();
+                        updateConditionInfo();
+                        //infoMode();
+            
+            function displayStats(){
+              //STATS  
+                            if (STATS_ENABLED == true) {
+                            stats.getDomElement().style.position = 'absolute';
+                            stats.getDomElement().style.right = '50px';
+                            stats.getDomElement().style.bottom = '0px';     
+                            document.body.appendChild( stats.getDomElement() );
+                            setInterval( function () {
+                                stats.update();
+                                }, 1000 / 60 );          
+                            }
+            }
+                    
+                        function init() {
+                            displayStats();
+                            
+                            var loader = new THREE.SceneLoader();
+              loader.load( "/static/eye/js/eye_scene.js", initScene);
+                        }
+        
+            function initScene(result) {
+              // make a private copy
+              loaded = result;
+              
+              //RENDERER
+              renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer   : true } );
+              renderer.setSize( window.innerWidth, window.innerHeight );
+              
+              //ANAGLYPH EFFECT 
+                            effect = new THREE.AnaglyphEffect( renderer );
+                            effect.setSize( window.innerWidth, window.innerHeight );
+          
+              // Copy from the loading file
+              scene = loaded.scene;
+              
+              //CAMERA  
+              camera = loaded.cameras.cam1;
+
+
+
+              // Add some light for ambiance
+              var light = new THREE.AmbientLight(0xA8A8A8);
+              light.position.set(0, 0, 1.0);
+              scene.add( light );
+              
+              var light2 = new THREE.DirectionalLight(0xffffff, 1.0);
+              light2.position.set(0, -350, 1.5);
+              scene.add( light2 );              
+
+              THREE.Object3D._threexDomEvent.camera(camera);
+              camera.aspect = window.innerWidth / window.innerHeight;
+              camera.updateProjectionMatrix();
+              scene.add( camera );
+            
+              // //TRACKBALL CONTROLS FOR CAMERA MOVEMENT (ROTATE, ZOOM, PAN)
+              // controls = new THREE.TrackballControls( camera, renderer.domElement );
+              // controls.rotateSpeed = 1.0;
+              // controls.zoomSpeed = 1.2;
+              // controls.panSpeed = 0.2;
+            
+              // controls.noZoom = false;
+              // controls.noPan = false;
+            
+              // controls.staticMoving = false;
+              // controls.dynamicDampingFactor = 0.3;
+            
+              // controls.minDistance = 1.1;
+              // controls.maxDistance = 1000;
+            
+              // controls.keys = [ 16, 17, 18 ]; // [ rotateKey, zoomKey, panKey ]
+            
+            
+              document.body.appendChild( renderer.domElement );
+              
+              // transparently support window resize
+                            THREEx.WindowResize.bind(renderer, camera);
+                            // allow 'p' to make screenshot
+                            THREEx.Screenshot.bindKey(renderer);
+                            // allow 'f' to go fullscreen where this feature is supported
+                            if( THREEx.FullScreen.available() ){
+                                THREEx.FullScreen.bindKey();    
+                            }
+              
+              appendObjectData(loaded.objects);   
+              selectedCondition.makeVisible(loaded.objects);  
+              animate();
+              switchCondition(C_healthy);
+            }
+            
+            
+            //GOOD========================================
+                        function animate() {
+                            // note: three.js includes requestAnimationFrame shim
+                            requestAnimationFrame( animate ); //does not render when the browser window is not active
+                            render();
+                        }
+                      
+            //GOOD========================================
+                        function render() { 
+                            // controls.update();
+                            //if (group) { group.rotation.x += 0.01; group.rotation.y += 0.02; } 
+                            if(anaglyph==true) {
+                                effect.render( scene, camera );
+                            }
+                            else{           
+                                renderer.render( scene, camera );
+                            }
+                        }
+            
+            
+            //GOOD========================================append metadata to all of the objects in the scene
+            function appendObjectData (loadedObjects){
+              
+              for (var key in loadedObjects){
+                  //object3d[key]=loadedObjects[key];
+                  loadedObjects[key].label = objectData[key].label;
+                  loadedObjects[key].anatomy = objectData[key].anatomy;
+                  loadedObjects[key].physiology = objectData[key].physiology;
+                  loadedObjects[key].infoLink = objectData[key].infoLink;
+                  console.log('key: ' + key);
+                  console.log('appending metadata!  loadedObject[key].label: ' + loadedObjects[key].label);
+                  console.log('appending metadata!  loadedObject[key].anatomy: ' + loadedObjects[key].anatomy);
+                  console.log('appending metadata!  loadedObject[key].physiology: ' + loadedObjects[key].physiology);
+                  console.log('appending metadata!  loadedObject[key].infoLink: ' + loadedObjects[key].infoLink);
+              }
+              
+            }
+            
+                        
+            //GOOD=============================================================
+                        function switchCondition(i){
+                            previousCondition=selectedCondition;
+                            selectedCondition=i;  
+                            console.log('selectedCondition: '+ selectedCondition.label + '; previousCondition: ' + previousCondition.label);
+              //selectedCondition.testMethod();
+                            previousCondition.makeInvisible(loaded.objects);
+              selectedCondition.makeVisible(loaded.objects);
+              //testVisibilityCondition(selectedCondition.components, previousCondition.components, loaded.objects);
+                            if (info==true){
+                                updateConditionInfo();  //updates information about current condition
+                selectedCondition.bindAnatomyInfo(loaded.objects);  //bind mouse event--click will update the info box
+                previousCondition.unbindAnatomyInfo(loaded.objects);
+                            };
+              if (labels==true){
+                previousCondition.unbindLabels(loaded.objects);
+                selectedCondition.bindLabels(loaded.objects);
+              };
+                        }
+                                        
+                 
+                      //GOOD (But could add tweening) =============================
+            
+            function zoomIn(loadedObjects){
+                console.log('zooming in');                
+                eyeScale*=1.10;              
+                for (var i in loadedObjects){
+                  loadedObjects[i].scale.set(eyeScale, eyeScale, eyeScale); 
+                }
+            }
+            
+            function zoomOut(loadedObjects){
+                console.log('zooming out');
+                eyeScale/=1.10;
+                for (var i in loadedObjects){
+                  console.log('loadedObjects[i]: '+ loadedObjects[i].scale.x);
+                  console.log('loadedObjects[i].label: ' +loadedObjects[i].label); 
+                  loadedObjects[i].scale.set(eyeScale, eyeScale, eyeScale);
+                }
+            }
+          
+            //GOOD=================================================
+                        function interactiveLabels(){
+                            if (labels==false){
+                                labels=true;  
+                                console.log('interactive labels turned on');
+                selectedCondition.bindLabels(loaded.objects);
+                            }
+                            else{
+                                labels=false;
+                                console.log('interactive labels turned off');
+                                document.getElementById("labelBox").style.visibility='hidden';
+                selectedCondition.unbindLabels(loaded.objects);
+                            }
+                        }
+                        
+            //GOOD========================================
+                        function mouseFollow(){
+                            var divName = 'labelBox';   // div that is to follow the mouse
+                                                        // (must be position:absolute)
+                            var offX = 10;              // X offset from mouse position
+                            var offY = -10;           // Y offset from mouse position
+                            
+                            function mouseX(evt) {
+                                    if (!evt) evt = window.event; 
+                                    if (evt.pageX) return evt.pageX; 
+                                    else if (evt.clientX)return evt.clientX + (document.documentElement.scrollLeft ?  document.documentElement.scrollLeft : document.body.scrollLeft); 
+                                    else return 0;
+                                    }
+                            function mouseY(evt) {
+                                if (!evt) evt = window.event; 
+                                if (evt.pageY) return evt.pageY; 
+                                else if (evt.clientY)return evt.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop); 
+                                else return 0;}
+                            
+                            function follow(evt) {
+                                if (document.getElementById) {
+                                    var obj = document.getElementById(divName).style; 
+                                    obj.left = (parseInt(mouseX(evt))+offX) + 'px';
+                                    obj.top = (parseInt(mouseY(evt))+offY) + 'px';}}
+                            document.onmousemove = follow;  
+                        }
+                        
+            //GOOD========================================
+                        function fullscreen(){
+                            if( THREEx.FullScreen.activated() ){
+                                THREEx.FullScreen.cancel();
+                                document.getElementById("fullscreenIcon").innerHTML = "v";
+                            }else{
+                                THREEx.FullScreen.request();
+                                document.getElementById("fullscreenIcon").innerHTML = "u";
+                            }
+                        }
+                    
+            //NEEDS WORK========================================
+                        function snapshot(){  //doesn't work yet
+                            console.log('taking a snapshot');
+                            var dataUrl = renderer.domElement.toDataURL("image/png");
+                            return dataURL;
+                        }
+                        
+            //GOOD========================================
+                        function infoMode(){
+                            if (info==false){
+                                info=true;
+                aboutOff();
+                                console.log('info box turned on');
+                                document.getElementById("infoBox").style.visibility='visible';
+                                updateConditionInfo();
+                selectedCondition.bindAnatomyInfo(loaded.objects);
+                //document.getElementById("tab-a").checked=true;
+                            }
+                            else{
+                                info=false;
+                                console.log('info box turned off');
+                                document.getElementById("infoBox").style.visibility='hidden';
+                selectedCondition.unbindAnatomyInfo(loaded.objects);
+                            }
+                        }
+            
+            function xInfo(){
+              document.getElementById("t_info").checked=false;
+              infoMode();
+            }
+            
+            function aboutOn(tab){
+              if (info==true){
+                infoMode();  //turns off info mode if it's on
+                document.getElementById("t_info").checked=false;  //unchecks it so it looks off
+              }
+              document.getElementById(tab).checked=true;
+              document.getElementById("about").style.visibility='visible';
+              
+            }
+            
+            function aboutOff(){
+              document.getElementById("about").style.visibility='hidden';
+            }
+                        
+            //GOOD========================================
+                        function updateConditionInfo(){
+                            document.getElementById("conditionName").innerHTML = selectedCondition.label;
+                            document.getElementById("conditionContent").innerHTML = selectedCondition.symptoms + "<br/>" + selectedCondition.treatment;
+                            document.getElementById("conditionLink").href = selectedCondition.infoLink;
+                        }
+            
+                      
+                        </script>
+<script type="text/javascript">
+            $(document).ready(function(){
+                namespace = '/eye'; // change to an empty string to use the global namespace
+
+                // the socket.io documentation recommends sending an explicit package upon connection
+                // this is specially important when using the global namespace
+                var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
+                socket.on('connect', function() {
+                    //socket.emit('my event', {data: 'I\'m connected!'});
+
+                });            
+
+                socket.on('YA3C::eye::GYRO_STREAM', function(message){
+                    // $("#scrap").html(message.replace(",","<br/>").replace(",","<br/>"));
+                    var _obj = message.split(",");
+                    // console.log(_obj);
+                    _obj[0] = (parseFloat(_obj[0])/180)*Math.PI; // 0-360
+                    _obj[1] = (parseFloat(_obj[1])/180)*Math.PI; // -180 - 180
+                    _obj[2] = (parseFloat(_obj[2])/180)*Math.PI; // -90 - 90
+                     // _obj[1] = (parseFloat(_obj[1]))*2; // -90 - 90
+
+                    // console.log(_obj);
+
+                    var quaternion = new THREE.Quaternion();
+                    quaternion.setFromEuler(new THREE.Vector3(_obj[0], _obj[1], _obj[2]), 'XYZ');
+
+                    Object.keys(modelOrder).forEach(function(key) {
+                      if(loaded.objects[modelOrder[key]]){
+                        loaded.objects[modelOrder[key]].useQuaternion = true;
+                        loaded.objects[modelOrder[key]].quaternion = quaternion;
+                        // loaded.objects[modelOrder[key]].lookAt(_obj[0], _obj[1], _obj[2]);
+
+                      }
+
+                    });
+
+                });
+
+
+
+            function topMod(count){
+                if(count<modelOrder.length){
+                    return count;
+                }else{
+                    return modelOrder.length - (count - modelOrder.length);
+                }
+            }
+
+            function clearModel(){
+                for(var i=0; i<modelOrder.length; i++){
+                    loaded.objects[modelOrder[i]].visible = false;
+                }
+                window.shake_count = modelOrder.length + 1;
+
+                $("#meshName").html("Eye");
+            }
+
+            function resetModel(){
+                for(var i=0; i<modelOrder.length; i++){
+                    loaded.objects[modelOrder[i]].visible = true;
+                }
+                window.shake_count = 0;
+                window.first_shake = false;
+                $("#meshName").html("Eye");
+                
+            }
+
+            //Shake Handling
+            window.shake_count = 0;
+            window.shake_count_increment = 1;
+
+            $("#meshName").html("Eye");
+
+            window.first_shake = false;
+            function processShake(){
+
+                        console.log("Shake Count PRE "+window.shake_count);
+                        console.log("Shake Count topMod "+topMod(window.shake_count));
+                        console.log(modelOrder[topMod(window.shake_count)]);
+                        if(loaded.objects[modelOrder[topMod(window.shake_count)]].visible){
+                            loaded.objects[modelOrder[topMod(window.shake_count)]].visible = false
+                        }else{
+                            loaded.objects[modelOrder[topMod(window.shake_count)]].visible = true                     
+                        }
+                            $("#meshName").html(objectData[modelOrder[topMod(window.shake_count)]].label);
+
+
+                        if(window.shake_count == 0 && window.first_shake){
+                            window.first_shake = false;
+                        }else{
+                            window.shake_count += window.shake_count_increment
+                            window.shake_count = window.shake_count % (2*modelOrder.length);
+
+                            window.first_shake = true;
+                        }
+
+                        
+                        if(window.shake_count == modelOrder.length){
+                            window.shake_count += window.shake_count_increment
+                            window.shake_count = window.shake_count % (2*modelOrder.length);
+                        }
+
+            }
+
+            var maxDistance = 250;
+            var minBound = 0.2;
+            var maxBound = 1;            
+            function setZoom(zoomLevel){
+                zoomLevel = 1 - zoomLevel/100;
+
+                // zoomLevel : [0,100]
+                if(zoomLevel < minBound){
+                    zoomLevel = minBound;
+                }
+                if(zoomLevel > maxBound){
+                    zoomLevel = maxBound;
+                }
+
+                console.log(-1 * maxDistance * zoomLevel);
+                camera.position.set( 0, 0, maxDistance * zoomLevel );
+            }
+
+            socket.on('YA3C::eye::COMMANDS', function(message){     
+
+                if(message=="SHAKE"){
+                    processShake();
+
+                }else if(message == "CLEAR_MODEL"){
+                    clearModel();
+                }else if(message == "RESET_MODEL"){
+                    resetModel();
+                }else{
+                    //zoomLevel
+                    //console.log(message);
+                    //window.spm = message;
+                    setZoom(parseFloat(message.split(",")[1]));
+                }
+
+            });
+
+            });       
+</script>
+
+</div>
+            
+        </div>
+        </div>  
+    </body> 
+</html>

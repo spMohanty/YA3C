@@ -80,7 +80,36 @@ def heart_commands_receiver(message):
     # Broadcast data to all connected clients
     emit('YA3C::heart::COMMANDS', message, broadcast=True)
 
+# =================================================================
+"""
+    Socket.io stream receiver for Eye app
+"""
+# =================================================================
 
+@socketio.on('YA3C::eye::GYRO_STREAM', namespace='/eye')
+def eye_gyro_receiver(message):
+    r = redis.Redis(connection_pool=p)
+    # Publish data on Redis PUB-SUB Channel
+    r.publish('YA3C::eye::GYRO_STREAM', message)
+    # Broadcast data to all connected clients
+    emit('YA3C::eye::GYRO_STREAM', message, broadcast=True)
+
+
+@socketio.on('YA3C::eye::ACCEL_STREAM', namespace='/eye')
+def eye_gyro_receiver(message):
+    r = redis.Redis(connection_pool=p)
+    # Publish data on Redis PUB-SUB Channel    
+    r.publish('YA3C::eye::ACCEL_STREAM', message)
+    # Broadcast data to all connected clients
+    emit('YA3C::eye::ACCEL_STREAM', message, broadcast=True)
+
+@socketio.on('YA3C::eye::COMMANDS', namespace='/eye')
+def eye_commands_receiver(message):
+    r = redis.Redis(connection_pool=p)
+    # Publish data on Redis PUB-SUB Channel    
+    r.publish('YA3C::eye::COMMANDS', message)
+    # Broadcast data to all connected clients
+    emit('YA3C::eye::COMMANDS', message, broadcast=True)
 
 # =================================================================
 # =================================================================
